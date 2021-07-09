@@ -122,6 +122,7 @@ def reserve_start():
     
     reserve_url = driver.current_url
 
+
     reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
     #reservation_confirm_btn.click()
     
@@ -160,6 +161,7 @@ while True:
         
         except exceptions.NoSuchElementException as e:
             print("페이지 변경으로 인해 새로고침 종료")
+            reserve_start()
             refresh_yn = keyboard.read_key()
             refresh_cnt = 1
             continue
