@@ -122,13 +122,19 @@ def reserve_start():
     
     reserve_url = driver.current_url
 
-
-    reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
-    #reservation_confirm_btn.click()
+    try:
+        #예약 버튼 클릭
+        reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
+        #reservation_confirm_btn.click()
     
+    #예약버튼마저 없는 경우는 아예 나가리 임으로 종료
+    except exceptions.NoSuchElementException :
+        return
+    
+    #예약버튼 있는경우는
     #페이지 이동 1초 기다림
     time.sleep(1)
-    #예약 클릭이 되었다면 페이지 이동이 됨으로 URL 비교 안되면 이전페이지로 이동
+    #예약 버튼이 있고 클릭이 되었다면 페이지 이동이 됨으로 URL 비교 안되면 이전페이지로 이동
     if (reserve_url == driver.current_url):
         driver.get(url = map_url)
         #이전페이지 이동을 위해 1초 대기
