@@ -111,10 +111,15 @@ def get_map_url():
     return cur_map_url
 
 def reserve_start():
-    #전체동의 체크
-    all_check_btn = driver.find_element_by_xpath('//*[@id="container"]/div/div[2]/div[2]/div/div/label')
-    all_check_btn.click()
 
+    try:
+        #전체동의 체크
+        all_check_btn = driver.find_element_by_xpath('//*[@id="container"]/div/div[2]/div[2]/div/div/label')
+        all_check_btn.click()
+
+    except exceptions.NoSuchElementException :
+        print("이미 전체동의 완료됨. 바로 예약 버튼 클릭 진행")
+    
     reserve_url = driver.current_url
 
     reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
@@ -188,11 +193,3 @@ while True:
 # while refresh_yn =='f2':
 #     refresh_btn.click()
 #     time.sleep(0.5)
-
-
-
-
-
-
-
-
