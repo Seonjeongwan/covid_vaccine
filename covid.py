@@ -38,37 +38,39 @@ driver.get(url = URL)
 
 #2초 기다리기
 driver.implicitly_wait(2)
-"""
-driver.find_element_by_xpath('//*[@id="account"]/a').click()
-
-driver.implicitly_wait(2)
-
-while True:
-    tag_id = driver.find_element_by_name('id')
-    tag_pw = driver.find_element_by_name('pw')
-
-    tag_id.clear() #있는거 제거    
-    
-    # id 입력
-    tag_id.click()
-    print("네이버 아니디를 입력 하세요 : ")
-    pyperclip.copy(input())
-    tag_id.send_keys(Keys.CONTROL, 'v')
-    time.sleep(1)
-
-    print("비밀번호를 입력 하세요 : ")
-    pyperclip.copy(input())
-    tag_pw.send_keys(Keys.CONTROL, 'v')
-    time.sleep(1)
-
-    driver.find_element_by_xpath('//*[@id="log.login"]').click()
+try :
+    driver.find_element_by_xpath('//*[@id="account"]/a').click()
 
     driver.implicitly_wait(2)
 
-    if (driver.current_url == URL):
-        break;
+    while True:
+        tag_id = driver.find_element_by_name('id')
+        tag_pw = driver.find_element_by_name('pw')
 
-"""
+        tag_id.clear() #있는거 제거    
+    
+        # id 입력
+        tag_id.click()
+        print("네이버 아니디를 입력 하세요 : ")
+        pyperclip.copy(input())
+        tag_id.send_keys(Keys.CONTROL, 'v')
+        time.sleep(1)
+
+        print("비밀번호를 입력 하세요 : ")
+        pyperclip.copy(input())
+        tag_pw.send_keys(Keys.CONTROL, 'v')
+        time.sleep(1)
+
+        driver.find_element_by_xpath('//*[@id="log.login"]').click()
+
+        driver.implicitly_wait(2)
+
+        if (driver.current_url == URL):
+            break;
+
+except exceptions.NoSuchElementException :
+    print("이미 로그인 되어있습니다. 백신 맵 이동")
+
 #print("사이트에서 아이디 비밀번호를 입력해주십시오")
 
 tag_search = driver.find_element_by_name('query')
@@ -125,10 +127,11 @@ def reserve_start():
     try:
         #예약 버튼 클릭
         reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
-        #reservation_confirm_btn.click()
+        reservation_confirm_btn.click()
     
     #예약버튼마저 없는 경우는 아예 나가리 임으로 종료
     except exceptions.NoSuchElementException :
+        print("예약 버튼 없음으로 인한 페이지 이동")
         return
     
     #예약버튼 있는경우는
@@ -139,6 +142,9 @@ def reserve_start():
         driver.get(url = map_url)
         #이전페이지 이동을 위해 1초 대기
         time.sleep(1)
+        return
+    else:
+        print("백신 예약 성공!!!!!!!!")
 
 
 while True:
@@ -153,7 +159,7 @@ while True:
             
             refresh_btn.click()
             
-            time.sleep(0.5)
+            time.sleep(1)
             
             print("새로고침중" + str(refresh_cnt))
             vacine_found = find_all_vaccine()
@@ -185,7 +191,7 @@ while True:
             continue
         except exceptions.WebDriverException :
             driver.get(url = map_url)
-            #이전페이지 이동을 위해 1초 대기
+            #이전페이지 이동을 위해  1초 대기
             time.sleep(1)
             
     else :

@@ -1,0 +1,8 @@
+#필요 모듈 & 명렁어
+ - pip install --upgrade pip 
+ - pip install selenium
+ - pip install pyperclip
+ - pip install keyboard
+
+# 크롬 드라이버 설치 필요 현재 버전에 맞는 드라이버 설치
+드라이버 다운로드 사이트 : https://chromedriver.chromium.org/downloads
