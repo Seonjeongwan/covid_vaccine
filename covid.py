@@ -155,13 +155,13 @@ def reserve_start():
     else: #url이 다른경우
         try :
             last_message = driver.find_element_by_class_name("h_title")
-            print(last_message.text())
+            print(last_message.text)
             time.sleep(3) #3초 시간을 주고
             ########if로 처리 빞요
             print("백신 잔여 수량 없음")
             driver.get(url = map_url) #다시 맵으로가서 검색함
             time.sleep(1)
-            
+
             return "full_reserve"
         except exceptions.NoSuchElementException :
             print("백신 예약 완료")
