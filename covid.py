@@ -128,11 +128,19 @@ def reserve_start():
         #예약 버튼 클릭
         reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
         reservation_confirm_btn.click()
-    
-    #예약버튼마저 없는 경우는 아예 나가리 임으로 종료
+
+        #예약 버튼을 클릭했으나 반응이 없는것으로 백신 예약 다참 다시 예약 시작
+        time.sleep(1)
+        if (reserve_url == driver.current_url):
+            driver.get(url = map_url)
+            #이전페이지 이동을 위해 1초 대기
+            time.sleep(1)
+            return "full_reserve"
+
+    #예약버튼마저 없는 경우는 아예 나가리 임으로 내가 임의로 페이지 이동을 한거
     except exceptions.NoSuchElementException :
         print("예약 버튼 없음으로 인한 페이지 이동")
-        return
+        return "wrong_page"
     
     #예약버튼 있는경우는
     #페이지 이동 1초 기다림
@@ -140,11 +148,23 @@ def reserve_start():
     #예약 버튼이 있고 클릭이 되었다면 페이지 이동이 됨으로 URL 비교 안되면 이전페이지로 이동
     if (reserve_url == driver.current_url):
         driver.get(url = map_url)
+        print(map_url)
         #이전페이지 이동을 위해 1초 대기
         time.sleep(1)
-        return
-    else:
-        print("백신 예약 성공!!!!!!!!")
+        return "full_reserve"
+    else: #url이 다른경우
+        try :
+            last_message = driver.find_element_by_class_name("h_title")
+            print(last_message.text())
+            time.sleep(3) #3초 시간을 주고
+            ########if로 처리 빞요
+            print("백신 잔여 수량 없음")
+            driver.get(url = map_url) #다시 맵으로가서 검색함
+            time.sleep(1)
+            
+            return "full_reserve"
+        except exceptions.NoSuchElementException :
+            print("백신 예약 완료")
 
 
 while True:
@@ -168,15 +188,30 @@ while True:
             else: 
                 reserve_btn = driver.find_element_by_xpath('//*[@id="app-root"]/div/div/div[3]/div/div/ul/li/div[2]/div[1]/a')
                 reserve_btn.click()
-                reserve_start()
+                #예약 결과 값을 집어넣어줌
+                result_reserve = reserve_start()
+                
+                print(result_reserve)
+                
+                if result_reserve == "wrong_page":
+                    refresh_yn = keyboard.read_key()
+                    refresh_cnt = 1
+                elif result_reserve == "full_reserve":
+                    refresh_yn = "f2"
+                    refresh_cnt = 1
                 continue
         
         except exceptions.NoSuchElementException as e:
             print("페이지 변경으로 인해 새로고침 종료")
-            reserve_start()
-            refresh_yn = keyboard.read_key()
-            refresh_cnt = 1
-            continue
+            result_reserve = reserve_start()
+            if result_reserve == "full_reserve":
+                refresh_yn = "f2"
+                refresh_cnt = 1
+                continue
+            else :
+                refresh_yn = keyboard.read_key()
+                refresh_cnt = 1
+                continue
         except exceptions.ElementClickInterceptedException :
             print("페이지 클릭으로 인한 새로고침 종료 재시작 위해 press F2")
             refresh_yn = keyboard.read_key()
@@ -197,13 +232,3 @@ while True:
     else :
         refresh_yn = keyboard.read_key()
         #print(refresh_yn)
-
-
-# if driver.find_element_by_xpath('//*[@id="_list_scroll_container"]/div/div/div[1]/div/div/div[2]/a'):
-#     print(driver.find_element_by_xpath('//*[@id="_list_scroll_container"]/div/div/div[1]/div/div/div[2]/a')) #존재여부 print
-#     refresh_btn = driver.find_element_by_xpath('//*[@id="_list_scroll_container"]/div/div/div[1]/div/div/div[2]/a')
-
-#입력키가 
-# while refresh_yn =='f2':
-#     refresh_btn.click()
-#     time.sleep(0.5)
