@@ -156,8 +156,9 @@ def reserve_start():
         try :
             last_message = driver.find_element_by_class_name("h_title")
             print(last_message.text)
+            print(last_message.text == "잔여백신 당일 예약이\n실패되었습니다.")
             time.sleep(3) #3초 시간을 주고
-            ########if로 처리 빞요
+            ########if로 처리 필요
             print("백신 잔여 수량 없음")
             driver.get(url = map_url) #다시 맵으로가서 검색함
             time.sleep(1)
@@ -199,19 +200,25 @@ while True:
                 elif result_reserve == "full_reserve":
                     refresh_yn = "f2"
                     refresh_cnt = 1
+                else :
+                    refresh_cnt = 1
                 continue
         
         except exceptions.NoSuchElementException as e:
             print("페이지 변경으로 인해 새로고침 종료")
             result_reserve = reserve_start()
-            if result_reserve == "full_reserve":
+
+            if result_reserve == "wrong_page":
+                refresh_yn = keyboard.read_key()
+                refresh_cnt = 1
+            elif result_reserve == "full_reserve" :
                 refresh_yn = "f2"
                 refresh_cnt = 1
-                continue
             else :
                 refresh_yn = keyboard.read_key()
                 refresh_cnt = 1
-                continue
+            continue
+        
         except exceptions.ElementClickInterceptedException :
             print("페이지 클릭으로 인한 새로고침 종료 재시작 위해 press F2")
             refresh_yn = keyboard.read_key()
