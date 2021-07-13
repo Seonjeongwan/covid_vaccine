@@ -87,6 +87,7 @@ print(refresh_yn)
 #print(fresh_yn) #입력된 키가 f2일 경우만 계속해서 돌리기
 
 map_url = "" #맵 url 이동용
+reserve_url = "" #예약 하는 페이지
 
 refresh_btn = '' #새로고침 버튼 만들기
 refresh_cnt = 1
@@ -118,29 +119,29 @@ def reserve_start():
         #전체동의 체크
         all_check_btn = driver.find_element_by_xpath('//*[@id="container"]/div/div[2]/div[2]/div/div/label')
         all_check_btn.click()
-
-    except exceptions.NoSuchElementException :
-        print("이미 전체동의 완료됨. 바로 예약 버튼 클릭 진행")
-    
-    reserve_url = driver.current_url
-
-    try:
-        #예약 버튼 클릭
         reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
         reservation_confirm_btn.click()
 
-        #예약 버튼을 클릭했으나 반응이 없는것으로 백신 예약 다참 다시 예약 시작
-        time.sleep(1)
-        if (reserve_url == driver.current_url):
-            driver.get(url = map_url)
-            #이전페이지 이동을 위해 1초 대기
-            time.sleep(1)
-            return "full_reserve"
-
-    #예약버튼마저 없는 경우는 아예 나가리 임으로 내가 임의로 페이지 이동을 한거
     except exceptions.NoSuchElementException :
-        print("예약 버튼 없음으로 인한 페이지 이동")
-        return "wrong_page"
+        
+        print("이미 전체동의 완료됨. 바로 예약 버튼 클릭 진행")
+        
+        reserve_url = driver.current_url
+
+        try:
+            reservation_confirm_btn = driver.find_element_by_xpath('//*[@id="reservation_confirm"]')
+            reservation_confirm_btn.click()
+        
+            #예약 버튼을 클릭했으나 반응이 없는것으로 백신 예약 다참 다시 예약 시작
+            time.sleep(1)
+            if (reserve_url == driver.current_url):
+                driver.get(url = map_url)
+                #이전페이지 이동을 위해 1초 대기
+                time.sleep(1)
+                return "full_reserve"
+        except exceptions.NoSuchElementException :
+            print("예약 버튼 없음으로 인한 직접 페이지 이동 확인")
+            return "wrong_page"
     
     #예약버튼 있는경우는
     #페이지 이동 1초 기다림
@@ -148,25 +149,22 @@ def reserve_start():
     #예약 버튼이 있고 클릭이 되었다면 페이지 이동이 됨으로 URL 비교 안되면 이전페이지로 이동
     if (reserve_url == driver.current_url):
         driver.get(url = map_url)
-        print(map_url)
         #이전페이지 이동을 위해 1초 대기
         time.sleep(1)
         return "full_reserve"
     else: #url이 다른경우
         try :
             last_message = driver.find_element_by_class_name("h_title")
-            print(last_message.text)
-            print(last_message.text == "잔여백신 당일 예약이\n실패되었습니다.")
-            time.sleep(3) #3초 시간을 주고
-            ########if로 처리 필요
-            print("백신 잔여 수량 없음")
-            driver.get(url = map_url) #다시 맵으로가서 검색함
-            time.sleep(1)
+            if last_message.text == "잔여백신 당일 예약이\n실패되었습니다.":
+                print("백신 잔여 수량 없음")
+                time.sleep(3) #3초 시간을 주고
+                driver.get(url = map_url) #다시 맵으로가서 검색함
+                time.sleep(1)
+                return "full_reserve"
 
-            return "full_reserve"
         except exceptions.NoSuchElementException :
             print("백신 예약 완료")
-
+            return "reserved"
 
 while True:
     #버튼을 눌렸을떄 그게 f2이라면 -> 새로고침 버튼을 찾아보고 -> 있으면 새로고침 / 없으면 다시 키입력받기 
@@ -177,10 +175,10 @@ while True:
             
             #맵 url 저장
             map_url = get_map_url()
-            
+        
             refresh_btn.click()
             
-            time.sleep(1)
+            #time.sleep(0.7)
             
             print("새로고침중" + str(refresh_cnt))
             vacine_found = find_all_vaccine()
@@ -201,6 +199,7 @@ while True:
                     refresh_yn = "f2"
                     refresh_cnt = 1
                 else :
+                    refresh_yn = keyboard.read_key()
                     refresh_cnt = 1
                 continue
         
@@ -218,7 +217,7 @@ while True:
                 refresh_yn = keyboard.read_key()
                 refresh_cnt = 1
             continue
-        
+
         except exceptions.ElementClickInterceptedException :
             print("페이지 클릭으로 인한 새로고침 종료 재시작 위해 press F2")
             refresh_yn = keyboard.read_key()
